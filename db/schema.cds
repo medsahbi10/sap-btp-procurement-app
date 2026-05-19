@@ -36,4 +36,5 @@
     status      : String(20) default 'Draft';
     requestDate : Date default $now;
     notes       : String(500);
+    virtual criticality : Integer;
   }
