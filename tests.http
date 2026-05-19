@@ -1,0 +1,59 @@
+### Variables
+@host = http://localhost:4004
+@service = {{host}}/procurement
+
+### 1. List vendors
+GET {{service}}/Vendors
+Accept: application/json
+
+### 2. List products
+GET {{service}}/Products
+Accept: application/json
+
+### 3. List purchase requests
+GET {{service}}/PurchaseRequests
+Accept: application/json
+
+### 4. Check approver for an amount (Manager tier)
+GET {{service}}/getRequiredApprover(amount=750)
+Accept: application/json
+
+### 5. Check approver for a larger amount (Director tier)
+GET {{service}}/getRequiredApprover(amount=6000)
+Accept: application/json
+
+### 6. Create a new Draft request (omit totalAmount, server computes it)
+POST {{service}}/PurchaseRequests
+Content-Type: application/json
+
+{
+  "requestedBy": "Mohamed Test",
+  "vendor_ID": "11111111-1111-1111-1111-111111111111",
+  "product_ID": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+  "quantity": 5,
+  "notes": "Test request created via REST"
+}
+
+### 7. List requests again - the new one should be there with totalAmount auto-computed
+GET {{service}}/PurchaseRequests?$top=10
+Accept: application/json
+
+### 8. Try illegal status transition - should FAIL with 400
+PATCH {{service}}/PurchaseRequests(77777777-7777-7777-7777-777777777777)
+Content-Type: application/json
+
+{
+  "status": "Closed"
+}
+
+### 9. Submit the Draft request 99999999 - large amount goes to Pending
+POST {{service}}/PurchaseRequests(99999999-9999-9999-9999-999999999999)/ProcurementService.submit
+Content-Type: application/json
+
+{}
+
+### 10. Approve the Pending request 77777777
+POST {{service}}/PurchaseRequests(77777777-7777-7777-7777-777777777777)/ProcurementService.approve
+Content-Type: application/json
+
+{}
